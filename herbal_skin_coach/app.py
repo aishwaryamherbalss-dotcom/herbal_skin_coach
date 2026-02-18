@@ -591,13 +591,31 @@ def product_card(prod, badge: str = ""):
         if p is None:
             return {}
         if isinstance(p, dict):
-            return dict(p)
+            # allow both 'type' and 'ptype' keys
+            d = dict(p)
+            if "type" not in d and "ptype" in d:
+                d["type"] = d.get("ptype")
+            return d
         if isinstance(p, str):
             return {"name": p}
+
+        # Support Product dataclass fields (ptype, purpose, best_for)
         d = {}
-        for k in ("name","type","category","why","usage","restrictions"):
-            if hasattr(p, k):
-                d[k] = getattr(p, k)
+        if hasattr(p, "name"):
+            d["name"] = getattr(p, "name")
+        if hasattr(p, "ptype"):
+            d["type"] = getattr(p, "ptype")
+        if hasattr(p, "category"):
+            d["category"] = getattr(p, "category")
+        if hasattr(p, "purpose"):
+            d["why"] = getattr(p, "purpose")
+        if hasattr(p, "usage"):
+            d["usage"] = getattr(p, "usage")
+        if hasattr(p, "restrictions"):
+            d["restrictions"] = getattr(p, "restrictions")
+        if hasattr(p, "best_for"):
+            d["best_for"] = getattr(p, "best_for")
+
         return d
     pd = _as_dict(prod)
     name = (pd.get("name") or "").strip()
@@ -641,9 +659,9 @@ def product_card(prod, badge: str = ""):
         """,
         unsafe_allow_html=True,
     )
-# =========================
-# AUTO FACE CROP (face-only scanning + avoid shirt marking)
-# =========================
+    # =========================
+    # AUTO FACE CROP (face-only scanning + avoid shirt marking)
+    # =========================
 def auto_crop_face(img: Image.Image, pad_ratio: float = 0.40) -> Tuple[Image.Image, Dict[str, Any]]:
     if not CV2_AVAILABLE:
         return img, {"ok": False, "reason": "opencv not available"}
@@ -667,6 +685,25 @@ def auto_crop_face(img: Image.Image, pad_ratio: float = 0.40) -> Tuple[Image.Ima
     x1 = min(W, x + w + pad_x)
     y1 = min(H, y + h + pad_y)
     crop = pil.crop((x0, y0, x1, y1))
+
+    # If the crop becomes too small (common on mobile selfie / close-up),
+    # expand it to keep enough pixels for quality checks & analysis.
+    cw, ch = crop.size
+    min_side = min(cw, ch)
+    if min_side < 520:
+        # Expand to a square-ish region around detected face
+        cx = x + w // 2
+        cy = y + h // 2
+        target = max(720, int(max(w, h) * (1 + 2 * pad_ratio)))
+        half = target // 2
+        x0e = max(0, cx - half)
+        y0e = max(0, cy - half)
+        x1e = min(W, cx + half)
+        y1e = min(H, cy + half)
+        # If clamped too much, just use full image
+        if (x1e - x0e) >= 320 and (y1e - y0e) >= 320:
+            crop = pil.crop((x0e, y0e, x1e, y1e))
+            x0, y0, x1, y1 = x0e, y0e, x1e, y1e
     meta = {
         "ok": True,
         "face_box": {"x": int(x), "y": int(y), "w": int(w), "h": int(h)},
@@ -757,32 +794,67 @@ def make_pose_guide(kind: str, w: int = 520, h: int = 360) -> Image.Image:
 # =========================
 # ELIGIBILITY
 # =========================
-def eligibility_check(img: Image.Image) -> Dict[str, Any]:
-    img2 = resize_max(img.copy(), 900).convert("RGB")
-    arr = pil_to_np(img2)
-    brightness = float(arr.mean() / 255.0)
-    if CV2_AVAILABLE:
-        gray = cv2.cvtColor(arr, cv2.COLOR_RGB2GRAY)
-        blur_score = float(cv2.Laplacian(gray, cv2.CV_64F).var())
-    else:
-        gray = arr.mean(axis=2) / 255.0
-        blur_score = float(np.var(gray) * 10000)
-    low_res = (min(img.size) < 600)
-    issues = []
-    if brightness < 0.32:
-        issues.append("Too dark. Window light / brighter natural light use pannunga.")
-    if brightness > 0.90:
-        issues.append("Too bright. Flash avoid pannunga.")
-    if low_res:
-        issues.append("Low resolution. Clear photo upload pannunga (face fill ~70%).")
-    if CV2_AVAILABLE:
-        if blur_score < 60:
-            issues.append("Blurry photo. Hold steady + tap to focus pannunga.")
-    else:
-        if blur_score < 8:
-            issues.append("Blurry photo. Hold steady + tap to focus pannunga.")
-    eligible = (len(issues) == 0)
-    return {"eligible": eligible, "brightness": brightness, "blur_score": blur_score, "issues": issues}
+def eligibility_check(img: Image.Image) -> Tuple[bool, List[str]]:
+    """Return (eligible, issues).
+
+    Goal: avoid rejecting decent mobile selfies while still protecting accuracy.
+
+    Rules:
+    - Low resolution is a warning unless extremely small.
+    - Lighting is a warning unless extremely dark/overexposed.
+    - Blur is a warning unless extremely blurry.
+    """
+    issues: List[str] = []
+    blockers: List[str] = []
+    warnings: List[str] = []
+
+    # Normalize for checks (mobile camera_input is often ~640x480)
+    img2 = resize_max(img, 1280)
+
+    gray = ImageOps.grayscale(img2)
+    arr = np.asarray(gray).astype(np.float32) / 255.0
+
+    brightness = float(arr.mean())
+
+    # Blur metric: variance of Laplacian
+    lap_var: float = 0.0
+    try:
+        lap_var = float(cv2.Laplacian((arr * 255).astype(np.uint8), cv2.CV_64F).var())
+    except Exception:
+        lap_var = 0.0
+
+    # --- Resolution (mostly warning)
+    min_side = min(img2.size)
+    # Treat low-res as warning unless extremely small.
+    if min_side < 420:
+        warnings.append("Low resolution. Clear photo upload pannunga (face fill ~70%).")
+        if min_side < 220:
+            blockers.append("Resolution romba kammi. Innum close/clear-a edunga.")
+
+    # --- Lighting (mostly warning)
+    if brightness < 0.30:
+        warnings.append("Too dark. Window light front-la ninnu edunga.")
+        if brightness < 0.20:
+            blockers.append("Romba dark. Light improve pannunga.")
+    if brightness > 0.92:
+        warnings.append("Too bright / overexposed. Flash avoid pannunga.")
+        if brightness > 0.97:
+            blockers.append("Romba bright. Overexposed — retake pannunga.")
+
+    # --- Blur (mobile tolerant)
+    # On mobile, compression/auto HDR can reduce laplacian variance.
+    if lap_var < 15:
+        blockers.append("Blur/Shake romba irukku. Phone steady-ah pidichi tap-to-focus pannunga.")
+    elif lap_var < 30:
+        warnings.append("Slight blur. Steady + tap-to-focus panna accuracy better varum.")
+
+    # Compose issues (show blockers first)
+    issues.extend(blockers)
+    issues.extend(warnings)
+
+    eligible = (len(blockers) == 0)
+    return eligible, issues
+
 # =========================
 # METRICS (ENGINE — UNCHANGED)
 # =========================
@@ -1194,17 +1266,44 @@ def make_report_pdf_bytes_attractive(
     from reportlab.pdfbase.ttfonts import TTFont
     # ---------- Helpers ----------
     def _as_prod_dict(p: Any) -> Dict[str, Any]:
+        """Normalize Product/object/dict to a dict used by PDF renderer."""
         if p is None:
             return {}
         if isinstance(p, dict):
-            return dict(p)
+            d = dict(p)
+            # allow both 'type' and 'ptype'
+            if "type" not in d and "ptype" in d:
+                d["type"] = d.get("ptype")
+            # allow 'why' from 'purpose'
+            if "why" not in d and "purpose" in d:
+                d["why"] = d.get("purpose")
+            return d
         if isinstance(p, str):
             return {"name": p}
+
         d: Dict[str, Any] = {}
-        for k in ("name", "type", "category", "why", "usage", "restrictions", "purpose"):
-            if hasattr(p, k):
-                d[k] = getattr(p, k)
+
+        if hasattr(p, "name"):
+            d["name"] = getattr(p, "name")
+        if hasattr(p, "ptype"):
+            d["type"] = getattr(p, "ptype")
+        elif hasattr(p, "type"):
+            d["type"] = getattr(p, "type")
+        if hasattr(p, "category"):
+            d["category"] = getattr(p, "category")
+        if hasattr(p, "usage"):
+            d["usage"] = getattr(p, "usage")
+        if hasattr(p, "restrictions"):
+            d["restrictions"] = getattr(p, "restrictions")
+
+        # Purpose → why (used in PDF)
+        if hasattr(p, "purpose"):
+            d["why"] = getattr(p, "purpose")
+        elif hasattr(p, "why"):
+            d["why"] = getattr(p, "why")
+
         return d
+
     def _resolve_product(p_any: Any) -> Dict[str, Any]:
         p = _as_prod_dict(p_any)
         name = (p.get("name") or "").strip()
@@ -1688,6 +1787,7 @@ def reset_for_new_customer():
         "client_name", "client_phone", "client_ref", "client_notes", "client_consent",
         "page",
         "session_id",
+        "force_analyze",
     ]
     for k in keys_to_clear:
         if k in st.session_state:
@@ -1975,12 +2075,20 @@ if st.session_state.page == "Upload":
                 else:
                     issues_all.append((nm, e["issues"]))
         if eligible_count == 0:
-            can_analyze = False
-            st.error("❌ Photo not eligible for scan. Please re-scan:")
-            for nm, issues in issues_all:
-                st.write(f"**{nm} issues:**")
-                for it in issues:
-                    st.write("•", it)
+            # Allow an override when user wants to proceed with low-quality photos.
+            if not st.session_state.get("force_analyze", False):
+                can_analyze = False
+                st.error("❌ Photo not eligible for scan. Please re-scan:")
+                for nm, issues in issues_all:
+                    st.write(f"**{nm} issues:**")
+                    for it in issues:
+                        st.write("•", it)
+                if st.button("Proceed anyway (accuracy may reduce)", use_container_width=True):
+                    st.session_state.force_analyze = True
+                    can_analyze = True
+                    st.warning("Proceeding anyway. Accuracy may reduce — re-take photos for best results.")
+            else:
+                st.warning("Proceeding with low-quality photos (accuracy may reduce). Re-take photos for best accuracy.")
     st.info(disclaimer_text())
     st.markdown("---")
     if st.button("Analyze My Skin (10–15 sec) →", disabled=not can_analyze, use_container_width=True):
