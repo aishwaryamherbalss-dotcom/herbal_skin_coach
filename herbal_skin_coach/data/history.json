@@ -1,0 +1,646 @@
+[
+  {
+    "ts": "2026-02-17T01:39:54",
+    "session_id": "c77afaa1-267b-4f61-b677-bbf9a9e7b412",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-17T01:35:31",
+    "session_id": "c6a077d9-fd78-4ff3-89a8-6727f5b9427b",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-17T01:10:37",
+    "session_id": "dc86b964-e82c-4b13-a3ab-e442b0a9d984",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-17T01:02:19",
+    "session_id": "4242c0a2-122b-46e9-a0da-7dcaf71db1ab",
+    "client_name": "Pandi",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-17T00:37:58",
+    "session_id": "f9cbc320-fe54-4065-b964-e7a1df2b4353",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-17T00:12:20",
+    "session_id": "dd0c8def-0403-4a83-807e-bcc2358a123a",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T23:01:02",
+    "session_id": "a37ebcb1-c634-49db-87df-0a0e7d4bd9fc",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T12:49:06",
+    "session_id": "e9a6d03e-0d11-4007-bc0f-2c42d9c4b0f6",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T02:31:42",
+    "session_id": "23c5aa57-3b1d-4ece-a9d0-81d81a0b70bc",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T02:18:55",
+    "session_id": "9d6ebccb-d29f-4f50-9345-6445d421f8e3",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T01:50:46",
+    "session_id": "bbfb4d84-2eb1-4d3a-a7a4-1bc25f6ba740",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T01:48:08",
+    "session_id": "0924e930-9ced-4b4a-9abd-709b68d62e5b",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T00:42:53",
+    "session_id": "720d6954-7efa-439f-9474-c789b23d45fb",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-16T00:04:12",
+    "session_id": "d901e929-9991-4225-9456-e0990a161c64",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T23:33:06",
+    "session_id": "a61e45fe-fa93-46c5-afa5-15eafbca355f",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T22:21:13",
+    "session_id": "2ceb2908-8e78-490a-b594-5ce1e7cdde6b",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T13:59:52",
+    "session_id": "b2bf408e-340e-4e98-bb4c-f6dd087d9655",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T13:31:51",
+    "session_id": "223d9642-18fc-4da9-ba8a-3b24bfee9318",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T12:49:50",
+    "session_id": "01abbdfe-8bc3-42d2-a983-bcfc4bf2ab61",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T11:18:16",
+    "session_id": "9fe3d5be-58c4-4fd4-b695-26845b7d0298",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T01:26:30",
+    "session_id": "952e23b1-7524-4173-a7cf-a9033eab3272",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T01:12:30",
+    "session_id": "4db68ce4-0ccd-44b6-89f2-67ede7ff21dc",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-15T00:11:56",
+    "session_id": "1af21e21-a01f-4a39-9fca-a038d391b223",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T23:52:25",
+    "session_id": "d14f94b2-6cf2-47da-8c6f-fb37fa70c916",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T23:33:58",
+    "session_id": "d473e035-8662-411d-b231-2d2b29f76cc9",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T23:25:10",
+    "session_id": "71d23945-d27e-4732-b8e0-9f7c9f131002",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T22:23:37",
+    "session_id": "1963cc5f-b4c0-440f-bcba-7802fca00918",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T19:15:39",
+    "session_id": "3abd2fa8-7949-4b6c-b8d3-8e8ad6a1febb",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T17:57:27",
+    "session_id": "c268d680-cbfc-4417-a12c-c0830493219a",
+    "client_name": "Pandi",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T17:54:21",
+    "session_id": "de0f761b-a722-496f-92e9-43ab57f51297",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T17:29:06",
+    "session_id": "0fb441c9-99fa-4194-a412-cd2a91b3b947",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-14T00:45:18",
+    "session_id": "2a12185c-d732-4c0a-baec-51a5e59e35ce",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T22:40:25",
+    "session_id": "f3385804-9639-4f66-b09f-3334a1f0fe0f",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T20:31:42",
+    "session_id": "72313510-694c-4945-920f-9d31fd9bde2c",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T19:42:39",
+    "session_id": "a5233eea-2266-48f7-aeab-fa9492d40395",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T18:47:04",
+    "session_id": "9afcee77-ff2c-4243-bfc5-6451e94e245d",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T17:57:59",
+    "session_id": "fbb328fc-568c-4230-9370-f42601dd03ab",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T17:02:27",
+    "session_id": "67d37d71-4517-4429-b411-3bd394143357",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T16:00:21",
+    "session_id": "ae281e39-fcd7-4243-80fe-dd6f43b0554f",
+    "client_name": "",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T03:07:48",
+    "session_id": "7c2daa15-efed-46d3-9d2c-4a3b794da185",
+    "client_name": "Selvi",
+    "client_phone": "",
+    "client_ref": "",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T02:58:13",
+    "session_id": "8bdf9341-b0b2-4aaa-a864-c6b0b0f00bf6",
+    "photos_used": 1,
+    "skin_type": "Normal / Balanced",
+    "main_product": "Kumkumadi Serum",
+    "confidence": 0.5,
+    "concerns": [
+      "Pigmentation / tanning (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T02:55:18",
+    "session_id": "a0321018-0dd0-4e6b-bcba-abbc7babe3cb",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T01:23:09",
+    "session_id": "1907c6bb-969b-46cb-b0ed-4b8973413ad6",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-13T01:19:53",
+    "session_id": "53760abf-b9da-478f-9364-eb20bbdc9c0a",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-12T23:21:13",
+    "session_id": "f7097b3a-7ff5-468f-94dd-b650ae706931",
+    "photos_used": 3,
+    "skin_type": "Normal / Balanced",
+    "main_product": "24K Gold Serum",
+    "confidence": 0.6599999999999999,
+    "concerns": [
+      "Maintenance / glow (estimate)"
+    ]
+  },
+  {
+    "ts": "2026-02-12T19:09:19",
+    "session_id": "e30a7b84-b3e0-4294-ac48-8c345f04b6c6",
+    "skin_type": "Normal",
+    "confidence": 0.4359199697995227
+  },
+  {
+    "ts": "2026-02-12T18:38:06",
+    "session_id": "65963090-1d4e-4316-b0b4-4e242f44acef",
+    "skin_type": "Normal / Balanced",
+    "main_product": "Clear Skin Herbal Serum",
+    "concerns": [
+      "Acne / redness (estimate)",
+      "Pigmentation / tanning (estimate)"
+    ],
+    "unlocked": true,
+    "confidence": 0.53
+  },
+  {
+    "ts": "2026-02-12T18:14:00",
+    "session_id": "27d299cb-991e-4b47-8e79-bb51cd1c9fb5",
+    "skin_type": "Normal / Balanced",
+    "main_product": "Clear Skin Herbal Serum",
+    "concerns": [
+      "Acne / redness (estimate)",
+      "Pigmentation / tanning (estimate)"
+    ],
+    "unlocked": true
+  }
+]

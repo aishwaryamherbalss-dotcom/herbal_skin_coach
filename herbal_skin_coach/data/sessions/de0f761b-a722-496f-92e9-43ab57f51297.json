@@ -1,0 +1,60 @@
+{
+  "ts": "2026-02-14T17:54:21",
+  "session_id": "de0f761b-a722-496f-92e9-43ab57f51297",
+  "client_name": "",
+  "client_phone": "",
+  "client_ref": "",
+  "client_notes": "",
+  "client_consent": false,
+  "ok": true,
+  "photos_used": 3,
+  "photo_labels": [
+    "Front",
+    "Left",
+    "Right"
+  ],
+  "avg_metrics": {
+    "brightness": 0.4474673810232052,
+    "redness": 0.0897668128212293,
+    "redness_pos": 0.0897668128212293,
+    "variance": 0.019391797793408234,
+    "variance_n": 0.3878359558681647,
+    "dark_ratio": 0.34263770774427477,
+    "shine": 0.008103900713593631,
+    "texture": 0.08162949327437599,
+    "texture_n": 0.40814746637188,
+    "spots": 1.3333333333333333,
+    "spots_n": 0.07407407407407407
+  },
+  "scores": {
+    "oily_score": 0.07568776135594968,
+    "dry_score": 0.5005956259632732,
+    "acne_score": 0.07831999621723801,
+    "pigment_score": 0.34537353208878196
+  },
+  "skin_type_base": "Normal / Balanced",
+  "skin_type": "Normal / Balanced",
+  "concerns": [
+    "Maintenance / glow (estimate)"
+  ],
+  "confidence": 0.6599999999999999,
+  "reasons": [
+    "3 photos average pannirukom → result more stable-aa varum."
+  ],
+  "main_product": "24K Gold Serum",
+  "goal": "glow",
+  "addons": {
+    "soap": "Goat Milk Soap",
+    "toner": "Rose Toner",
+    "gel": "Red Wine Anti-Aging Gel",
+    "weekly": null
+  },
+  "combo_info": {
+    "ok": true,
+    "is_combination": false,
+    "tzone_shine": 0.017628205128205128,
+    "cheek_shine": 0.0005937500000000001,
+    "diff": 0.017034455128205127,
+    "note": "T-zone shine: 0.018, Cheek shine: 0.001, Diff: 0.017"
+  }
+}
