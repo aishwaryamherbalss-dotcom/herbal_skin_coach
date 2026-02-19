@@ -2390,7 +2390,7 @@ elif st.session_state.page == "Report":
             concern_pick = st.multiselect(
                 "Main concern (optional)",
                 ["Dullness", "Tan", "Pigmentation", "Acne", "Blackheads", "Dryness", "Oiliness", "Dark circles", "Sensitive"],
-                default=(st.session_state.analysis.get("concerns") or [])[:2],
+                default=_map_defaults_to_options((st.session_state.analysis.get("concerns") or [])[:2], ["Dullness", "Tan", "Pigmentation", "Acne", "Blackheads", "Dryness", "Oiliness", "Dark circles", "Sensitive"]),
             )
 
             colA, colB = st.columns([1, 1])
@@ -2444,7 +2444,7 @@ elif st.session_state.page == "Report":
             manual_concerns = st.multiselect(
                 "Concerns",
                 ["Dullness", "Tan", "Pigmentation", "Acne", "Blackheads", "Dryness", "Oiliness", "Dark circles", "Sensitive"],
-                default=(st.session_state.analysis.get("concerns") or [])[:2],
+                default=_map_defaults_to_options((st.session_state.analysis.get("concerns") or [])[:2], ["Dullness", "Tan", "Pigmentation", "Acne", "Blackheads", "Dryness", "Oiliness", "Dark circles", "Sensitive"]),
             )
 
             colA, colB, colC = st.columns([1, 1, 1])
