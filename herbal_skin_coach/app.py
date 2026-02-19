@@ -33,6 +33,47 @@ SHOW_SECONDARY_RESET = False
 import numpy as np
 import streamlit as st
 
+
+# -------------------------
+# Safe UI defaults (prevents StreamlitAPIException when defaults not in options)
+def _normalize_token(x: str) -> str:
+    return str(x).strip().lower().replace("_", " ").replace("-", " ")
+
+def _map_defaults_to_options(defaults, options, mapping=None):
+    """Return a list of defaults guaranteed to be within options."""
+    if defaults is None:
+        return []
+    if not isinstance(defaults, (list, tuple, set)):
+        defaults = [defaults]
+    options_set = set(options)
+    norm_to_option = {_normalize_token(o): o for o in options}
+    out = []
+    for d in defaults:
+        if d is None:
+            continue
+        # if already valid label
+        if d in options_set:
+            out.append(d)
+            continue
+        dn = _normalize_token(d)
+        # mapping (internal -> label)
+        if mapping:
+            mapped = mapping.get(dn) or mapping.get(str(d).strip()) or mapping.get(str(d))
+            if mapped in options_set:
+                out.append(mapped)
+                continue
+        # try match by normalized token
+        if dn in norm_to_option:
+            out.append(norm_to_option[dn])
+            continue
+    # keep unique order
+    seen = set()
+    uniq = []
+    for x in out:
+        if x not in seen:
+            uniq.append(x); seen.add(x)
+    return uniq
+
 # -------------------------
 # Session helpers (photos)
 # -------------------------
@@ -2371,10 +2412,29 @@ elif st.session_state.page == "Report":
 
         else:  # No
             st.warning("No problem — we can correct it quickly.")
+            manual_type_opts = ["normal", "oily", "dry", "combination"]
+            _raw_skin = (st.session_state.analysis.get("skin_type") or "normal")
+            _raw_skin = str(_raw_skin).strip().lower()
+            
+            # Normalize common variants
+            if _raw_skin in ("combi", "combo", "comb", "combination"):
+                _raw_skin = "combination"
+            elif _raw_skin not in manual_type_opts:
+                # Try to infer from mixed labels (e.g., "oily/combination")
+                if "oil" in _raw_skin:
+                    _raw_skin = "oily"
+                elif "dry" in _raw_skin:
+                    _raw_skin = "dry"
+                elif "comb" in _raw_skin:
+                    _raw_skin = "combination"
+                else:
+                    _raw_skin = "normal"
+            
+            _skin_idx = manual_type_opts.index(_raw_skin) if _raw_skin in manual_type_opts else 0
             manual_type = st.selectbox(
                 "Select skin type",
-                ["normal", "oily", "dry", "combination"],
-                index=["normal", "oily", "dry", "combination"].index((st.session_state.analysis.get("skin_type") or "normal")),
+                manual_type_opts,
+                index=_skin_idx,
             )
             manual_goal = st.selectbox(
                 "Primary goal",
