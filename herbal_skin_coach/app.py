@@ -20,7 +20,7 @@
 # Run:
 #   pip install streamlit pillow numpy opencv-python reportlab
 #   streamlit run app.py
-import os, json, time, uuid, io, textwrap
+import os, json, time, uuid, io, textwrap, hashlib
 import re
 import datetime as dt
 from dataclasses import dataclass
@@ -32,6 +32,36 @@ from datetime import datetime
 SHOW_SECONDARY_RESET = False
 import numpy as np
 import streamlit as st
+
+# -------------------------
+# Session helpers (photos)
+# -------------------------
+def _img_key(pose_key: str) -> str:
+    pose_key = (pose_key or "").strip().lower()
+    if pose_key in ("front", "f"):
+        return "front_img"
+    if pose_key in ("left", "l"):
+        return "left_img"
+    if pose_key in ("right", "r"):
+        return "right_img"
+    # fallback: store raw by name
+    return f"{pose_key}_img"
+
+def set_image(pose_key: str, img):
+    """Store captured PIL image in session_state under the expected keys."""
+    k = _img_key(pose_key)
+    st.session_state[k] = img
+
+def get_image(pose_key: str):
+    k = _img_key(pose_key)
+    return st.session_state.get(k, None)
+
+def clear_images():
+    for k in ("front_img", "left_img", "right_img"):
+        if k in st.session_state:
+            del st.session_state[k]
+
+
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps, ImageDraw
 try:
     import cv2
@@ -427,6 +457,94 @@ def goal_badge(goal: str) -> str:
         f"color:{color};border:2px solid var(--ah-gold);padding:6px 14px;'"
         f">✨ {label.upper()}</span>"
     )
+
+
+# ---------------------------
+# Smart Confirmation (mobile-friendly)
+# ---------------------------
+
+def _derive_skin_type_from_answers(oily: str, tight: str) -> str:
+    """Return one of: oily, dry, combination, normal."""
+    oily_yes = oily == "Yes"
+    tight_yes = tight == "Yes"
+    oily_no = oily == "No"
+    tight_no = tight == "No"
+
+    if oily_yes and tight_no:
+        return "oily"
+    if tight_yes and oily_no:
+        return "dry"
+    if oily_yes and tight_yes:
+        return "combination"
+    if oily_no and tight_no:
+        return "normal"
+
+    if oily_yes:
+        return "oily"
+    if tight_yes:
+        return "dry"
+    return "normal"
+
+
+def refine_analysis_with_user_confirmation(
+    data: dict,
+    *,
+    verdict: str,
+    oily_by_noon: str | None = None,
+    tight_after_wash: str | None = None,
+    breakouts: str | None = None,
+    manual_skin_type: str | None = None,
+    manual_concerns: list[str] | None = None,
+    manual_goal: str | None = None,
+) -> dict:
+    """Refine the existing analysis without breaking downstream logic."""
+    refined = dict(data or {})
+    refined["user_confirmation"] = {
+        "verdict": verdict,
+        "oily_by_noon": oily_by_noon,
+        "tight_after_wash": tight_after_wash,
+        "breakouts": breakouts,
+        "manual_skin_type": manual_skin_type,
+        "manual_concerns": manual_concerns,
+        "manual_goal": manual_goal,
+    }
+
+    refined.setdefault("_original", {})
+    refined["_original"].setdefault("skin_type", (data or {}).get("skin_type"))
+    refined["_original"].setdefault("goal", (data or {}).get("goal"))
+
+    scores = refined.get("scores") or {}
+
+    conf = float(refined.get("confidence") or 0.6)
+    if verdict == "No":
+        conf = max(0.35, conf - 0.20)
+    elif verdict == "Not sure":
+        conf = max(0.45, conf - 0.10)
+    refined["confidence"] = conf
+
+    if manual_skin_type:
+        refined["skin_type"] = manual_skin_type
+        refined["skin_type_base"] = manual_skin_type
+
+    if oily_by_noon and tight_after_wash and not manual_skin_type:
+        refined_type = _derive_skin_type_from_answers(oily_by_noon, tight_after_wash)
+        refined["skin_type"] = refined_type
+        refined["skin_type_base"] = refined_type
+
+    if manual_concerns is not None:
+        refined["concerns"] = manual_concerns
+
+    if manual_goal:
+        refined["goal"] = manual_goal
+
+    try:
+        stype = refined.get("skin_type_base") or refined.get("skin_type")
+        refined["main"] = decide_main_product(scores, stype)
+        refined["addons"] = decide_addons(scores, stype)
+    except Exception:
+        pass
+
+    return refined
 
 def info_chips(data: Dict[str, Any]):
     """Small summary chips used in Actions section."""
@@ -1920,15 +2038,9 @@ if st.session_state.page == "Upload":
     st.session_state.client_consent = st.checkbox("Save locally on this device (consent)",
                                                   value=bool(st.session_state.client_consent))
     st.markdown("---")
-    st.markdown("### 📷 Capture with Camera (Mobile-friendly)")
-    st.caption("Use camera for quick capture. Works in browser (same Wi-Fi is enough).")
-    cam1, cam2, cam3 = st.columns(3)
-    with cam1:
-        cap_front = st.camera_input("Camera: Front", key="cam_front")
-    with cam2:
-        cap_left = st.camera_input("Camera: Left", key="cam_left")
-    with cam3:
-        cap_right = st.camera_input("Camera: Right", key="cam_right")
+    st.markdown("### 📷 Guided Capture (Front → Left → Right)")
+    st.caption("One-by-one guided capture for easy mobile use. Complete all 3 angles for best accuracy.")
+
     def preprocess_image_for_upload(pil_img: Image.Image, max_side: int = 1600) -> Image.Image:
         """Normalize orientation, convert to RGB, and downscale huge images for faster processing."""
         try:
@@ -1942,60 +2054,88 @@ if st.session_state.page == "Upload":
             bg.paste(pil_img, mask=pil_img.split()[-1])
             pil_img = bg
         w, h = pil_img.size
-        m = max(w, h)
-        if m > max_side:
-            scale = max_side / float(m)
-            pil_img = pil_img.resize((int(w * scale), int(h * scale)))
+        scale = max(w, h) / float(max_side)
+        if scale > 1:
+            pil_img = pil_img.resize((int(w / scale), int(h / scale)))
         return pil_img
-    def simple_square_crop(pil_img: Image.Image, zoom: float = 1.15, shift_x: float = 0.0, shift_y: float = 0.0) -> Image.Image:
-        """Simple optional square crop around (shifted) center.
-        zoom: 1.0 = full square, 2.0 = tighter crop.
-        shift_x/shift_y: -0.35..0.35 shifts crop center (relative).
-        """
-        w, h = pil_img.size
-        side = min(w, h)
-        crop_side = int(side / max(1.0, zoom))
-        crop_side = max(200, min(crop_side, side))
-        cx = w / 2 + shift_x * (w * 0.35)
-        cy = h / 2 + shift_y * (h * 0.35)
-        left = int(cx - crop_side / 2)
-        top = int(cy - crop_side / 2)
-        left = max(0, min(left, w - crop_side))
-        top = max(0, min(top, h - crop_side))
-        return pil_img.crop((left, top, left + crop_side, top + crop_side))
-    def set_image(kind: str, img: Image.Image):
-        img_raw = resize_max(img.convert("RGB"), 1600)
-        meta = {"ok": False}
-        if st.session_state.auto_face_crop_on:
-            img_crop, meta = auto_crop_face(img_raw)
-        else:
-            img_crop = img_raw
-        if kind == "front":
-            st.session_state.front_raw = img_raw
-            st.session_state.front_img = img_crop
-        elif kind == "left":
-            st.session_state.left_raw = img_raw
-            st.session_state.left_img = img_crop
-        else:
-            st.session_state.right_raw = img_raw
-            st.session_state.right_img = img_crop
-        if st.session_state.show_crop_preview:
-            if meta.get("ok"):
-                st.caption(f"{kind.title()} auto-cropped to face ✅")
-            else:
-                st.warning(f"{kind.title()} face not detected clearly — using full image. Re-take if needed.")
-    if cap_front is not None:
-        set_image("front", Image.open(cap_front))
-    if cap_left is not None:
-        set_image("left", Image.open(cap_left))
-    if cap_right is not None:
-        set_image("right", Image.open(cap_right))
+
+    # Wizard state
+    if "capture_step" not in st.session_state:
+        st.session_state.capture_step = 0  # 0=Front, 1=Left, 2=Right, 3=Done
+
+    steps = [("front", "Front", "Look straight • Face centered • Neutral expression"),
+             ("left", "Left", "Turn head LEFT ~30–45° • Keep eyes forward"),
+             ("right", "Right", "Turn head RIGHT ~30–45° • Keep eyes forward")]
+
+    step_idx = int(st.session_state.capture_step)
+    progress = min(step_idx, 3) / 3.0
+    st.progress(progress, text=f"Step {min(step_idx+1, 3)} of 3")
+
+    if step_idx >= 3:
+        st.success("✅ All 3 photos captured! Scroll down to Analyze.")
+    else:
+        pose_key, pose_label, pose_hint = steps[step_idx]
+
+        with st.container(border=True):
+            st.markdown(f"#### Step {step_idx+1}: {pose_label}")
+            st.info(pose_hint)
+
+            tab_cam, tab_up = st.tabs(["📷 Camera", "🗂 Upload"])
+            with tab_cam:
+                cap = st.camera_input(f"Capture {pose_label}", key=f"wiz_cam_{pose_key}_{step_idx}")
+                if cap is not None:
+                    b = cap.getvalue()
+                    h = hashlib.md5(b).hexdigest()
+                    if st.session_state.get(f"wiz_hash_{pose_key}") != h:
+                        st.session_state[f"wiz_hash_{pose_key}"] = h
+                        img = preprocess_image_for_upload(Image.open(cap))
+                        set_image(pose_key, img)
+                        st.session_state.capture_step = step_idx + 1
+                        st.rerun()
+
+            with tab_up:
+                up = st.file_uploader(f"Upload {pose_label}", type=["jpg", "jpeg", "png"], key=f"wiz_up_{pose_key}_{step_idx}")
+                if up is not None:
+                    b = up.getvalue()
+                    h = hashlib.md5(b).hexdigest()
+                    if st.session_state.get(f"wiz_hash_{pose_key}") != h:
+                        st.session_state[f"wiz_hash_{pose_key}"] = h
+                        img = preprocess_image_for_upload(Image.open(up))
+                        # Optional crop (same as before, but simpler in wizard)
+                        with st.expander("✂️ Crop / adjust (optional)", expanded=False):
+                            enable = st.checkbox("Enable crop", value=False, key=f"wiz_crop_on_{pose_key}_{step_idx}")
+                            zoom = st.slider("Zoom", 1.0, 2.0, 1.15, 0.05, key=f"wiz_zoom_{pose_key}_{step_idx}")
+                            sx = st.slider("Left ↔ Right", -0.35, 0.35, 0.0, 0.01, key=f"wiz_sx_{pose_key}_{step_idx}")
+                            sy = st.slider("Up ↕ Down", -0.35, 0.35, 0.0, 0.01, key=f"wiz_sy_{pose_key}_{step_idx}")
+                            if enable:
+                                preview = simple_square_crop(img, zoom=zoom, shift_x=sx, shift_y=sy)
+                                st.image(preview, caption="Cropped preview", use_container_width=True)
+                                img = preview
+                            else:
+                                st.caption("Crop disabled — original image will be used.")
+                        set_image(pose_key, img)
+                        st.session_state.capture_step = step_idx + 1
+                        st.rerun()
+
+            nav1, nav2, nav3 = st.columns([1, 1, 2])
+            with nav1:
+                if st.button("⬅ Back", disabled=(step_idx == 0), use_container_width=True, key=f"wiz_back_{step_idx}"):
+                    st.session_state.capture_step = max(0, step_idx - 1)
+                    st.rerun()
+            with nav2:
+                if st.button("🔁 Retake this step", use_container_width=True, key=f"wiz_retake_{pose_key}_{step_idx}"):
+                    setattr(st.session_state, f"{pose_key}_raw", None)
+                    setattr(st.session_state, f"{pose_key}_img", None)
+                    st.session_state.pop(f"wiz_hash_{pose_key}", None)
+                    st.rerun()
+            with nav3:
+                st.caption("Tip: Keep face ~70% of frame • Window/front light • Tap-to-focus")
+
     st.markdown("---")
-    st.markdown("### 🗂️ Or Upload from Gallery / Files")
-    st.info(
-        "📸 Quick photo tips: Face centered • Bright light • No filters • No tilt • "
-        "Face should fill ~60–70% of the frame • If needed, use the optional crop below."
-    )
+    st.markdown("### 🗂️ Optional: Upload any missing angles (Gallery / Files)")
+    st.caption("If you prefer, you can still upload images directly for any angle below.")
+
+    # Simple fallback upload (kept for flexibility)
     a, b, c = st.columns(3)
     def upload_with_optional_crop(label: str, key_prefix: str, pose_key: str):
         f = st.file_uploader(label, type=["jpg", "jpeg", "png"], key=key_prefix)
@@ -2021,6 +2161,7 @@ if st.session_state.page == "Upload":
     with c:
         upload_with_optional_crop("Upload Right", "u_right", "right")
     # Preview thumbnails: show face-cropped (what engine uses)
+
     p1, p2, p3 = st.columns(3)
     with p1:
         if st.session_state.front_img is not None:
@@ -2069,11 +2210,11 @@ if st.session_state.page == "Upload":
                        ("Left", st.session_state.left_img),
                        ("Right", st.session_state.right_img)]:
             if im is not None:
-                e = eligibility_check(im)
-                if e["eligible"]:
+                eligible, issues = eligibility_check(im)
+                if eligible:
                     eligible_count += 1
                 else:
-                    issues_all.append((nm, e["issues"]))
+                    issues_all.append((nm, issues))
         if eligible_count == 0:
             # Allow an override when user wants to proceed with low-quality photos.
             if not st.session_state.get("force_analyze", False):
@@ -2159,6 +2300,116 @@ elif st.session_state.page == "Report":
     if not data or not data.get("ok"):
         st.warning("No report yet. Go to Upload → Analyze or History → Load.")
         st.stop()
+
+
+    # --- Result preview (so user can confirm correctly) ---
+    st.markdown("### 🔎 Result preview")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Skin type", str(data.get("skin_type", "—")))
+    c2.metric("Main goal", str(data.get("goal", "—")))
+    conf = float(data.get("confidence", 0.0))
+    c3.metric("Confidence", f"{int(round(conf*100))}%")
+    concerns = data.get("concerns") or []
+    if concerns:
+        st.markdown("**Key concerns detected:** " + " • ".join([str(x) for x in concerns[:6]]))
+    st.caption("This is an estimate based on photo quality + lighting. You can fine-tune below.")
+
+    # --- Smart Confirmation (improves accuracy) ---
+    if "analysis_confirmed" not in st.session_state:
+        st.session_state.analysis_confirmed = False
+    if "analysis_verdict" not in st.session_state:
+        st.session_state.analysis_verdict = "Yes"
+
+    with st.expander("✅ Quick confirmation (improves accuracy)", expanded=True):
+        st.caption("Based on the preview above: **does this match you?** If not, we fine-tune (we recommend what your skin needs).")
+        verdict = st.radio(
+            "Does the preview match you?",
+            options=["Yes", "Not sure", "No"],
+            index=["Yes", "Not sure", "No"].index(st.session_state.analysis_verdict),
+            horizontal=True,
+            key="analysis_verdict_radio",
+        )
+        st.session_state.analysis_verdict = verdict
+
+        if verdict == "Yes":
+            colA, colB = st.columns([1, 1])
+            with colA:
+                if st.button("✅ Confirm & continue", use_container_width=True):
+                    st.session_state.analysis_confirmed = True
+            with colB:
+                if st.button("Proceed anyway (accuracy may reduce)", use_container_width=True):
+                    st.session_state.analysis_confirmed = True
+
+        elif verdict == "Not sure":
+            st.markdown("**Quick 3 questions (10 seconds):**")
+            oily_by_noon = st.radio("By noon, does your face look shiny/oily?", ["Yes", "No", "Not sure"], horizontal=True)
+            tight_after = st.radio("After facewash, does skin feel tight/dry?", ["Yes", "No", "Not sure"], horizontal=True)
+            breakouts = st.radio("Do you get frequent pimples/whiteheads?", ["Yes", "No", "Not sure"], horizontal=True)
+
+            concern_pick = st.multiselect(
+                "Main concern (optional)",
+                ["Dullness", "Tan", "Pigmentation", "Acne", "Blackheads", "Dryness", "Oiliness", "Dark circles", "Sensitive"],
+                default=(st.session_state.analysis.get("concerns") or [])[:2],
+            )
+
+            colA, colB = st.columns([1, 1])
+            with colA:
+                if st.button("Update results", use_container_width=True):
+                    st.session_state.analysis = refine_analysis_with_user_confirmation(
+                        st.session_state.analysis,
+                        verdict="Not sure",
+                        oily_by_noon=oily_by_noon,
+                        tight_after_wash=tight_after,
+                        breakouts=breakouts,
+                        manual_concerns=concern_pick,
+                    )
+                    st.session_state.analysis_confirmed = True
+                    st.rerun()
+            with colB:
+                if st.button("Proceed anyway (accuracy may reduce)", use_container_width=True):
+                    st.session_state.analysis_confirmed = True
+
+        else:  # No
+            st.warning("No problem — we can correct it quickly.")
+            manual_type = st.selectbox(
+                "Select skin type",
+                ["normal", "oily", "dry", "combination"],
+                index=["normal", "oily", "dry", "combination"].index((st.session_state.analysis.get("skin_type") or "normal")),
+            )
+            manual_goal = st.selectbox(
+                "Primary goal",
+                ["Glow", "Tan removal", "Pigmentation", "Acne control", "Hydration", "Maintenance"],
+                index=0,
+            )
+            manual_concerns = st.multiselect(
+                "Concerns",
+                ["Dullness", "Tan", "Pigmentation", "Acne", "Blackheads", "Dryness", "Oiliness", "Dark circles", "Sensitive"],
+                default=(st.session_state.analysis.get("concerns") or [])[:2],
+            )
+
+            colA, colB, colC = st.columns([1, 1, 1])
+            with colA:
+                if st.button("Use selected", use_container_width=True):
+                    st.session_state.analysis = refine_analysis_with_user_confirmation(
+                        st.session_state.analysis,
+                        verdict="No",
+                        manual_skin_type=manual_type,
+                        manual_goal=manual_goal,
+                        manual_concerns=manual_concerns,
+                    )
+                    st.session_state.analysis_confirmed = True
+                    st.rerun()
+            with colB:
+                if st.button("Go to Upload (retake)", use_container_width=True):
+                    st.session_state.page = "Upload"
+                    st.rerun()
+            with colC:
+                if st.button("Proceed anyway (accuracy may reduce)", use_container_width=True):
+                    st.session_state.analysis_confirmed = True
+
+    if not st.session_state.analysis_confirmed:
+        st.stop()
+
     addons = data["addons"]
     face_primary = st.session_state.front_img or st.session_state.left_img or st.session_state.right_img
     st.subheader("🧾 Summary (stable estimate)")
